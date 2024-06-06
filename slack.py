@@ -3,6 +3,7 @@ from slack_sdk.errors import SlackApiError
 import requests
 import json
 import time
+import os
 # Your Slack bot token
 token = os.getenv('token')
 channel_id = os.getenv('channel_id')
