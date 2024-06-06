@@ -33,7 +33,7 @@ while True:
     print(scrape)
     result = client.chat_postMessage(
         channel=channel_id,
-        text=scrape
+        text="``` \n"+scrape+"\nPowered by Replyτensor 🔥```"
     )
     print(f"Message sent successfully, ts: {result['ts']}")
     time.sleep(3600)
