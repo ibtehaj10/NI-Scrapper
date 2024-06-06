@@ -29,7 +29,7 @@ def scraping():
 # try:
     # Call the chat.postMessage method using the WebClient
 while True:
-    scrape = scraping().text
+    scrape = scraping().json()
     print(scrape)
     result = client.chat_postMessage(
         channel=channel_id,
