@@ -101,12 +101,4 @@ def generate_table(data):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5088)
-xhz").text)
-                    Vtrust = float(i.find_element(By.CLASS_NAME, "css-1yk0z1b").text)
 
-                    if Vtrust < 0.90:
-                        vtrust_below_090.append((SN, Updated, Vtrust))
-                    if Updated > 500:
-                        updated_above_500.append((SN, Updated, Vtrust))
-
-            return vtrust_below_090, updated_above_500
