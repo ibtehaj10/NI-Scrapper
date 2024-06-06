@@ -48,7 +48,7 @@ def VMBot():
                     try:
                         Updated = int(i.find_element(By.CLASS_NAME, "css-sxb40e").text)
                     except:
-                        Updated = int(i.find_element(By.CLASS_NAME, "css-w2v").text)
+                        Updated = int(i.find_element(By.CLASS_NAME, ""css-w2vxhz").text)
                     Vtrust = float(i.find_element(By.CLASS_NAME, "css-1yk0z1b").text)
                     if Vtrust < 0.90:
                         vtrust_below_090.append((SN, Updated, Vtrust))
