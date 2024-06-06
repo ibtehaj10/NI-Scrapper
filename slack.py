@@ -6,9 +6,10 @@ import time
 # Your Slack bot token
 slack_token = ""
 client = WebClient(token=slack_token)
-
+token = os.getenv('token')
+channel_id = os.getenv('channel_id')
 # The channel ID or name where you want to send the message
-channel_id = ""
+# channel_id = ""
 
 
 def scraping():
