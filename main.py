@@ -36,7 +36,7 @@ def VMBot():
 
         time.sleep(5)
 
-   def extract_data(product_container):
+        def extract_data(product_container):
             vtrust_below_090 = []
             updated_above_500 = []
 
@@ -84,6 +84,7 @@ def VMBot():
     # Prepare strings to hold the table contents
     vtrust_table = ""
     updated_table = ""
+
 
 
 
