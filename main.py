@@ -48,7 +48,7 @@ def VMBot():
                     try:
                         Updated = int(i.find_element(By.CLASS_NAME, "css-sxb40e").text)
                     except:
-                        Updated = int(i.find_element(By.CLASS_NAME, "css-w2v")
+                        Updated = int(i.find_element(By.CLASS_NAME, "css-w2v").text)
         try:
             product_container = driver.find_elements(By.CLASS_NAME, "css-fwdaki")
             vtrust_below_090, updated_above_500 = extract_data(product_container)
