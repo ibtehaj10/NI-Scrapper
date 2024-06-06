@@ -48,17 +48,7 @@ def VMBot():
                     try:
                         Updated = int(i.find_element(By.CLASS_NAME, "css-sxb40e").text)
                     except:
-                        Updated = int(i.find_element(By.CLASS_NAME, "css-w2vxhz").text)
-                    Vtrust = float(i.find_element(By.CLASS_NAME, "css-1yk0z1b").text)
-
-                    if Vtrust < 0.90:
-                        vtrust_below_090.append((SN, Updated, Vtrust))
-                    if Updated > 500:
-                        updated_above_500.append((SN, Updated, Vtrust))
-
-            return vtrust_below_090, updated_above_500
-
-        try:
+                        Updated = int(i.find_element(By.CLASS_NAME, "css-w2v        try:
             product_container = driver.find_elements(By.CLASS_NAME, "css-fwdaki")
             vtrust_below_090, updated_above_500 = extract_data(product_container)
         except Exception as e:
@@ -85,9 +75,6 @@ def VMBot():
     vtrust_table = ""
     updated_table = ""
 
-
-
-
     # Populate the table strings
     if vtrust_below_090:
         vtrust_table += "The following validators have Vtrust values below 0.90:\n"
@@ -113,17 +100,7 @@ def generate_table(data):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5088)
-
-
-            # Get the HTML content of the element
-            for data in product_container:
-                SN = data.find_element(By.CLASS_NAME, "css-9wjxum").text
-                Vali = data.find_elements(By.CLASS_NAME, "css-flded9")
-                for i in Vali[1:2]:
-                    try:
-                        Updated = int(i.find_element(By.CLASS_NAME, "css-sxb40e").text)
-                    except:
-                        Updated = int(i.find_element(By.CLASS_NAME, "css-w2vxhz").text)
+xhz").text)
                     Vtrust = float(i.find_element(By.CLASS_NAME, "css-1yk0z1b").text)
 
                     if Vtrust < 0.90:
@@ -132,5 +109,3 @@ if __name__ == '__main__':
                         updated_above_500.append((SN, Updated, Vtrust))
 
             return vtrust_below_090, updated_above_500
-
-        try:
