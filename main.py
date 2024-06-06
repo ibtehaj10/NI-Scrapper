@@ -1,138 +1,112 @@
-import logging
-import pandas as pd
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
 import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from flask import Flask, request, jsonify
-import os
-import smtplib
-from email.message import EmailMessage
-import ssl
-import requests
+# import schedule
+options = Options()
+options.add_argument('--headless')
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
 
 
 app = Flask(__name__)
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 
-# Retrieve email credentials from environment variables
-# sender_email = os.environ.get('SENDER-EMAIL')
-# receiver_emails = os.environ.get('RECEIVER-EMAIL')  # Comma-separated list of email addresses
-# email_password = os.environ.get('EMAIL-PASSWORD')
 
-# print(receiver_emails)
 
-# if not sender_email or not receiver_emails or not email_password:
-#     logging.error("Email credentials not provided. Please set the SENDER_EMAIL, RECEIVER_EMAILS, and EMAIL_PASSWORD environment variables.")
-#     exit()
-
-# Convert the comma-separated string of email addresses to a list
-# receiver_email_list = [email.strip() for email in receiver_emails.split(',')]
 @app.route('/scrape', methods=['POST'])
-def scrape():
-    while True:
-        # Initialize the WebDriver
-        driver = webdriver.Chrome()
+def VMBot():
+    print("running .. ")
+    def scrape_data():
+        # Path to geckodriver executable
+        #geckodriver_path = "geckodriver.exe"
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        # URL of the webpage
+        url = "https://x.taostats.io/validator/5HNQURvmjjYhTSksi8Wfsw676b4owGwfLR2BFAQzG7H3HhYf#performance"
 
-        # Navigate to the webpage
-        driver.get('https://taostats.io/validators/neural-internet/')
+        # Setup Firefox webdriver with Selenium
+        #options = webdriver.FirefoxOptions()
+        #options.add_argument('--headless')  # Run the browser in headless mode
+        #driver = webdriver.Firefox(service=Service(geckodriver_path), options=options)
 
-        # Adding a delay after the page loads
-        time.sleep(2)
+        # Load the webpage
+        driver.get(url)
 
-        # Wait for the elements to be present on the page
-        try:
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'staking_data_block')))
+        time.sleep(5)
+
+        def extract_data(product_container):
+            vtrust_below_090 = []
+            updated_above_500 = []            product_container = driver.find_elements(By.CLASS_NAME, "css-fwdaki")
+            vtrust_below_090, updated_above_500 = extract_data(product_container)
         except Exception as e:
-            logging.error(f"Error waiting for elements: {e}")
-            driver.quit()
-            continue  # Continue to the next iteration of the loop
+            print("Error extracting data:", e)
+            vtrust_below_090, updated_above_500 = [], []
 
-        # locate the data_block
-        data_block = driver.find_elements(By.CLASS_NAME, 'staking_data_block')
+        try:
+            product_container = driver.find_elements(By.CLASS_NAME, "css-1347uem")
+            data1, data2 = extract_data(product_container)
+            vtrust_below_090.extend(data1)
+            updated_above_500.extend(data2)
+        except Exception as e:
+            print("Error extracting data:", e)
 
-        # Lists
-        SN = []
-        Updated = []
-        Vtrust = []
-        vtrust_below_threshold = []  
-        Updated_below_threshold = []  
-
-        # Process the found elements as needed
-        for block in data_block:
-            try:
-                #SN.append(block.find_element(By.XPATH, './/div[1]/div/small').text)
-                SN.append(block.find_element(By.XPATH, './/div[1]/div[@class="stake_val"]/small').text)
-                updated_value = block.find_element(By.XPATH, './/div[6]/div/small').text
-                Updated.append(updated_value)
-                vtrust_value = float(block.find_element(By.XPATH, './/div[7]/div/small').text)
-                Vtrust.append(vtrust_value)
-
-                logging.info(f"Data extracted for SN: {SN[-1]}, Updated: {updated_value}, VTrust: {vtrust_value}")
-
-                # Check if Vtrust is below 0.90 and store the information
-                print("updated_value : "+updated_value+" Type : "+str(type(updated_value)))
-                if vtrust_value < 0.90 :
-                    vtrust_below_threshold.append((SN[-1], updated_value, vtrust_value))
-                if  int(updated_value) > 500:
-                    Updated_below_threshold.append((SN[-1], updated_value, vtrust_value))
-
-            except NoSuchElementException as e:
-                logging.error(f"Error extracting data: {e}. Skipping this validator.")
-                continue  # Skip to the next iteration if an element is not found
-            except ValueError as e:
-                logging.error(f"Error converting Vtrust value to float: {e}. Skipping this validator.")
-                continue  # Skip to the next iteration if the Vtrust value cannot be converted to float
-
-        # Close the WebDriver
+        # Close the browser session
         driver.quit()
 
-        # Check if there are instances where Vtrust is below 0.90 and send a single email to multiple receivers
-        if vtrust_below_threshold:
-            # Email configuration
-            # email_subject = 'Vtrust Drop Notification'
-            
-            # Create EmailMessage object
-            # msg = EmailMessage()
-            
-            # Compose email body
-            Vtrust_head = "The following validators have Vtrust values below 0.90:\n\n"
-            for sn, updated_value, vtrust_value in vtrust_below_threshold:
-                Vtrust_head += f"SN: {sn},    Updated: {updated_value},    Vtrust: {vtrust_value}\n"
-            print(Vtrust_head)
+        return vtrust_below_090, updated_above_500
 
-        if Updated_below_threshold:
-            updated_head = "The following validators have Updated values above 500:\n\n"
-            for sn, updated_value, vtrust_value in Updated_below_threshold:
-                updated_head += f"SN: {sn},    Updated: {updated_value},    Vtrust: {vtrust_value}\n"
-            print(updated_head)
+    # Call the function to execute the scraping
+    vtrust_below_090, updated_above_500 = scrape_data()
+    print("here 2")
+    # Prepare strings to hold the table contents
+    vtrust_table = ""
+    updated_table = ""
 
-        body = Vtrust_head + "\n\n"+ updated_head +"\n\n"+"Powered By Replyτensor 🔥"
-        return body
-            
-            # return email_body
-            # msg.set_content(email_body)
-            # msg['Subject'] = email_subject
-            # msg['From'] = sender_email
-            # msg['To'] = ', '.join(receiver_email_list)  # Join the list of receivers into a comma-separated string
+    # Populate the table strings
+    if vtrust_below_090:
+        vtrust_table += "The following validators have Vtrust values below 0.90:\n"
+        vtrust_table += generate_table(vtrust_below_090)
+        vtrust_table += "\n"
 
-            # # Send email using SMTP
-            # try:
-            #     context = ssl.create_default_context()
-            #     with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
-            #         server.login(sender_email, email_password)
-            #         server.send_message(msg)
-            #         logging.info("Email notification sent successfully")
-            
-            # except Exception as e:
-            #     logging.error(f"Error sending email notification: {e}")
+    if updated_above_500:
+        updated_table += "The following validators have Updated values above 500:\n"
+        updated_table += generate_table(updated_above_500)
 
-        # Sleep for 3 hours before the next iteration
-        # time.sleep(30)
+    return [vtrust_table, updated_table]
 
-if __name__ == "__main__":
-    # check_vtrust_and_notify()
-    app.run()
+def generate_table(data):
+    table = "+----+---------+---------+\n"
+    table += "| SN | Updated |  Vtrust |\n"
+    table += "+----+---------+---------+\n"
+    for row in data:
+        table += f"| {row[0]:<2} | {row[1]:^7} | {row[2]:.5f} |\n"
+    table += "+----+---------+---------+\n"
+    print("generation done")
+    return table
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0',port=5088)
+
+
+            # Get the HTML content of the element
+            for data in product_container:
+                SN = data.find_element(By.CLASS_NAME, "css-9wjxum").text
+                Vali = data.find_elements(By.CLASS_NAME, "css-flded9")
+                for i in Vali[1:2]:
+                    try:
+                        Updated = int(i.find_element(By.CLASS_NAME, "css-sxb40e").text)
+                    except:
+                        Updated = int(i.find_element(By.CLASS_NAME, "css-w2vxhz").text)
+                    Vtrust = float(i.find_element(By.CLASS_NAME, "css-1yk0z1b").text)
+
+                    if Vtrust < 0.90:
+                        vtrust_below_090.append((SN, Updated, Vtrust))
+                    if Updated > 500:
+                        updated_above_500.append((SN, Updated, Vtrust))
+
+            return vtrust_below_090, updated_above_500
+
+        try:
