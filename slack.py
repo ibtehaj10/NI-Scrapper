@@ -4,7 +4,9 @@ import requests
 import json
 import time
 # Your Slack bot token
-slack_token = ""
+token = os.getenv('token')
+channel_id = os.getenv('channel_id')
+slack_token = token
 client = WebClient(token=slack_token)
 token = os.getenv('token')
 channel_id = os.getenv('channel_id')
