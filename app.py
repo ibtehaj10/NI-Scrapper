@@ -116,6 +116,8 @@ def filter_and_format_data(data):
 def wallet_info(request: WalletRequest):
     raw_output = get_btcli_wallet_info(request.wallet_name, width=request.width, sort_by=request.sort_by)
     parsed_data = parse_btcli_output(raw_output)
+    print(parsed_data)
+    
     result = filter_and_format_data(parsed_data)
     return {"result": result}
 
