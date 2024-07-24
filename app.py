@@ -76,7 +76,7 @@ def filter_and_format_data(data):
                     "VTRUST": detail["VTRUST"],
                     "UPDATED": detail["UPDATED"]
                 })
-            if updated   updated > 500:
+            if  updated > 500:
                 updated_details.append({
                     "VTRUST": detail["VTRUST"],
                     "UPDATED": detail["UPDATED"]
