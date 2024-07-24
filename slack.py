@@ -16,15 +16,24 @@ client = WebClient(token=slack_token)
 
 
 def scraping():
-    url = "http://135.181.63.160:5088/scrape"
 
-    payload = json.dumps({})
+    
+    url = "http://127.0.0.1:8000/wallet-info/"
+    
+    payload = json.dumps({
+      "wallet_name": "ni",
+      "width": 200,
+      "sort_by": "VTRUST"
+    })
     headers = {
-    'Content-Type': 'application/json'
+      'Content-Type': 'application/json'
     }
-
+    
     response = requests.request("POST", url, headers=headers, data=payload)
+    
+    print(response.text)
     return response
+
 
 # try:
     # Call the chat.postMessage method using the WebClient
