@@ -123,5 +123,5 @@ def wallet_info(request: WalletRequest):
         updated_table += generate_table(updated_above_500)
     
     # result = filter_and_format_data(parsed_data)
-    return {[vtrust_table,updated_table]}
+    return [vtrust_table,updated_table]
 
