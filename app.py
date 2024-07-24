@@ -67,19 +67,19 @@ def clean_data(raw_data):
     updated_above_500 = []
     # print(raw_data)
     for i in raw_data:
-
-        updated = i["details"][0]['UPDATED']
-        vtrusts = i["details"][0]['VTRUST']
-        SN = i["subnet"]
-        lis = {"SN":SN,"Vtrust":vtrusts,"Updated":updated}
-        print(lis)
-        # print(SN, vtrust, updated)
-        if float(vtrusts) < 0.90:
-            # print(lis)
-            vtrust_below_90.append(lis)
-        if int(updated) > 500:
-            # print(lis)
-            updated_above_500.append(lis)
+        if "details" in I:
+            updated = i["details"][0]['UPDATED']
+            vtrusts = i["details"][0]['VTRUST']
+            SN = i["subnet"]
+            lis = {"SN":SN,"Vtrust":vtrusts,"Updated":updated}
+            print(lis)
+            # print(SN, vtrust, updated)
+            if float(vtrusts) < 0.90:
+                # print(lis)
+                vtrust_below_90.append(lis)
+            if int(updated) > 500:
+                # print(lis)
+                updated_above_500.append(lis)
     return vtrust_below_90 , updated_above_500
 def generate_table(data):
     # Determine column widths
