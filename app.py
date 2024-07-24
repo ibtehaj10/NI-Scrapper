@@ -62,61 +62,62 @@ def parse_btcli_output(output):
     return subnets
 
 
-def filter_and_format_data(data):
-    filtered_data = []
-    filtered_data2 = []
-    for subnet in data:
-        vtrust_details = []
-        updated_details = []
-        for detail in subnet["details"]:
-            vtrust = float(detail.get("VTRUST", 0))
-            updated = float(detail.get("UPDATED", 0))
-            if vtrust < 0.90:
-                vtrust_details.append({
-                    "VTRUST": detail["VTRUST"],
-                    "UPDATED": detail["UPDATED"]
-                })
-            if  updated > 500:
-                updated_details.append({
-                    "VTRUST": detail["VTRUST"],
-                    "UPDATED": detail["UPDATED"]
-                })
-        if vtrust_details:
-            filtered_data.append({
-                "subnet": subnet["subnet"],
-                "details": vtrust_details
-            })
-        if updated_details:
-            filtered_data.append({
-                "subnet": subnet["subnet"],
-                "details": updated_details
-            })
-    
-    # Format as table in string
-    formatted_result = ""
-    for subnet in filtered_data:
-        formatted_result += f"Subnet: {subnet['subnet']}\n"
-        formatted_result += "VTRUST\tUPDATED\n"
-        for detail in subnet["details"]:
-            formatted_result += f"{detail['VTRUST']}\t{detail['UPDATED']}\n"
-        formatted_result += "\n"
-        # Format as table in string
-    formatted_result2 = ""
-    for subnet in filtered_data2:
-        formatted_result2 += f"Subnet: {subnet['subnet']}\n"
-        formatted_result2 += "VTRUST\tUPDATED\n"
-        for detail in subnet["details"]:
-            formatted_resul2t += f"{detail['VTRUST']}\t{detail['UPDATED']}\n"
-        formatted_result2 += "\n"
+def clean_data(raw_data):
+    vtrust_below_90 = []
+    updated_above_500 = []
+    # print(raw_data)
+    for i in raw_data:
 
-    return formatted_result,formatted_result2
+        updated = i["details"][0]['UPDATED']
+        vtrusts = i["details"][0]['VTRUST']
+        SN = i["subnet"]
+        lis = {"SN":SN,"Vtrust":vtrusts,"Updated":updated}
+        print(lis)
+        # print(SN, vtrust, updated)
+        if float(vtrusts) < 0.90:
+            # print(lis)
+            vtrust_below_90.append(lis)
+        if int(updated) > 500:
+            # print(lis)
+            updated_above_500.append(lis)
+    return vtrust_below_90 , updated_above_500
+def generate_table(data):
+    # Determine column widths
+    sn_width = max(len(str(row['SN'])) for row in data) + 4
+    updated_width = max(len(row['Updated']) for row in data) + 6
+    vtrust_width = max(len(row['Vtrust']) for row in data)  + 4
+
+    table = f"+{'-' * sn_width}+{'-' * updated_width}+{'-' * vtrust_width}+\n"
+    table += f"| {'SN'.ljust(sn_width-1)}| {'Updated'.ljust(updated_width-1)}| {'Vtrust'.ljust(vtrust_width-1)}|\n"
+    table += f"+{'-' * sn_width}+{'-' * updated_width}+{'-' * vtrust_width}+\n"
+
+    for row in data:
+        table += f"| {str(row['SN']).ljust(sn_width-1)}| {row['Updated'].ljust(updated_width-1)}| {row['Vtrust'].ljust(vtrust_width-1)}|\n"
+    
+    table += f"+{'-' * sn_width}+{'-' * updated_width}+{'-' * vtrust_width}+\n"
+    print("Generation done")
+    return table
 
 
 @app.post("/wallet-info/")
 def wallet_info(request: WalletRequest):
     raw_output = get_btcli_wallet_info(request.wallet_name, width=request.width, sort_by=request.sort_by)
     parsed_data = parse_btcli_output(raw_output)
-    print(parsed_data)
+    vtrust_below_090, updated_above_500 = clean_data(parsed_data)
+    print("here 2")
+    # Prepare strings to hold the table contents
+    vtrust_table = ""
+    updated_table = ""
+    
+    # Populate the table strings
+    if vtrust_below_090:
+        vtrust_table += "The following validators have Vtrust values below 0.90:\n"
+        vtrust_table += generate_table(vtrust_below_090)
+        vtrust_table += "\n"
+    
+    if updated_above_500:
+        updated_table += "The following validators have Updated values above 500:\n"
+        updated_table += generate_table(updated_above_500)
     
     result = filter_and_format_data(parsed_data)
     return {"result": result}
