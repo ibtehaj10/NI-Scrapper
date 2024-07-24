@@ -67,7 +67,7 @@ def clean_data(raw_data):
     updated_above_500 = []
     # print(raw_data)
     for i in raw_data:
-        if "details" in I:
+        if "details" in i:
             updated = i["details"][0]['UPDATED']
             vtrusts = i["details"][0]['VTRUST']
             SN = i["subnet"]
