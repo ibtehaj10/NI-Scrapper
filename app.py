@@ -64,20 +64,32 @@ def parse_btcli_output(output):
 
 def filter_and_format_data(data):
     filtered_data = []
+    filtered_data2 = []
     for subnet in data:
-        subnet_details = []
+        vtrust_details = []
+        updated_details = []
         for detail in subnet["details"]:
             vtrust = float(detail.get("VTRUST", 0))
             updated = float(detail.get("UPDATED", 0))
-            if vtrust < 0.90 and updated > 500:
-                subnet_details.append({
+            if vtrust < 0.90:
+                vtrust_details.append({
                     "VTRUST": detail["VTRUST"],
                     "UPDATED": detail["UPDATED"]
                 })
-        if subnet_details:
+            if updated   updated > 500:
+                updated_details.append({
+                    "VTRUST": detail["VTRUST"],
+                    "UPDATED": detail["UPDATED"]
+                })
+        if vtrust_details:
             filtered_data.append({
                 "subnet": subnet["subnet"],
-                "details": subnet_details
+                "details": vtrust_details
+            })
+        if updated_details:
+            filtered_data.append({
+                "subnet": subnet["subnet"],
+                "details": updated_details
             })
     
     # Format as table in string
@@ -88,6 +100,14 @@ def filter_and_format_data(data):
         for detail in subnet["details"]:
             formatted_result += f"{detail['VTRUST']}\t{detail['UPDATED']}\n"
         formatted_result += "\n"
+        # Format as table in string
+    formatted_result2 = ""
+    for subnet in filtered_data2:
+        formatted_result2 += f"Subnet: {subnet['subnet']}\n"
+        formatted_result2 += "VTRUST\tUPDATED\n"
+        for detail in subnet["details"]:
+            formatted_resul2t += f"{detail['VTRUST']}\t{detail['UPDATED']}\n"
+        formatted_result2 += "\n"
 
     return formatted_result
 
