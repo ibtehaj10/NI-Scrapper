@@ -109,7 +109,7 @@ def filter_and_format_data(data):
             formatted_resul2t += f"{detail['VTRUST']}\t{detail['UPDATED']}\n"
         formatted_result2 += "\n"
 
-    return formatted_result
+    return formatted_result,formatted_result2
 
 
 @app.post("/wallet-info/")
