@@ -103,6 +103,7 @@ def generate_table(data):
 def wallet_info(request: WalletRequest):
     raw_output = get_btcli_wallet_info(request.wallet_name, width=request.width, sort_by=request.sort_by)
     parsed_data = parse_btcli_output(raw_output)
+    print(parsed_data)
     vtrust_below_090, updated_above_500 = clean_data(parsed_data)
     print("here 2")
     # Prepare strings to hold the table contents
@@ -119,6 +120,6 @@ def wallet_info(request: WalletRequest):
         updated_table += "The following validators have Updated values above 500:\n"
         updated_table += generate_table(updated_above_500)
     
-    result = filter_and_format_data(parsed_data)
-    return {"result": result}
+    # result = filter_and_format_data(parsed_data)
+    return {[vtrust_table,updated_table]}
 
