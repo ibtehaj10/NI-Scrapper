@@ -13,7 +13,7 @@ class WalletRequest(BaseModel):
 
 
 def get_btcli_wallet_info(wallet_name, arg='overview', width=200, sort_by='VTRUST'):
-    try:
+    # try:
         # Construct the command with the argument, width, and sort_by option
         cmd = ['btcli', 'wallet', arg]
 
@@ -29,8 +29,8 @@ def get_btcli_wallet_info(wallet_name, arg='overview', width=200, sort_by='VTRUS
             return stdout
         else:
             return f"Error: {stderr}"
-    except Exception as e:
-        return str(e)
+    # except Exception as e:
+    #     return str(e)
 
 
 def parse_btcli_output(output):
